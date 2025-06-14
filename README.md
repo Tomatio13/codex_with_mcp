@@ -1,5 +1,5 @@
 <h1 align="center">OpenAI Codex CLI</h1>
-<p align="center">Lightweight coding agent that runs in your terminal</p>
+<p align="center">ターミナルで動作する軽量なコーディングエージェント</p>
 
 <p align="center"><code>npm i -g @openai/codex</code></p>
 
@@ -8,49 +8,54 @@
 ---
 
 <details>
-<summary><strong>Table of contents</strong></summary>
+<summary><strong>目次</strong></summary>
 
 <!-- Begin ToC -->
 
-- [Experimental technology disclaimer](#experimental-technology-disclaimer)
-- [Quickstart](#quickstart)
-- [Why Codex?](#why-codex)
-- [Security model & permissions](#security-model--permissions)
-  - [Platform sandboxing details](#platform-sandboxing-details)
-- [System requirements](#system-requirements)
-- [CLI reference](#cli-reference)
-- [Memory & project docs](#memory--project-docs)
-- [Non-interactive / CI mode](#non-interactive--ci-mode)
-- [Tracing / verbose logging](#tracing--verbose-logging)
-- [Recipes](#recipes)
-- [Installation](#installation)
-- [Configuration guide](#configuration-guide)
-  - [Basic configuration parameters](#basic-configuration-parameters)
-  - [Custom AI provider configuration](#custom-ai-provider-configuration)
-  - [History configuration](#history-configuration)
-  - [Configuration examples](#configuration-examples)
-  - [Full configuration example](#full-configuration-example)
-  - [Custom instructions](#custom-instructions)
-  - [Environment variables setup](#environment-variables-setup)
+- [実験的技術に関する免責事項](#実験的技術に関する免責事項)
+- [クイックスタート](#クイックスタート)
+- [なぜCodex？](#なぜcodex)
+- [セキュリティモデルと権限](#セキュリティモデルと権限)
+  - [プラットフォームサンドボックスの詳細](#プラットフォームサンドボックスの詳細)
+- [システム要件](#システム要件)
+- [CLIリファレンス](#cliリファレンス)
+- [メモリとプロジェクトドキュメント](#メモリとプロジェクトドキュメント)
+- [非対話/CIモード](#非対話ciモード)
+- [トレース/詳細ログ](#トレース詳細ログ)
+- [レシピ](#レシピ)
+- [インストール](#インストール)
+- [MCP（Model Control Protocol）統合](#mcpmodel-control-protocol統合)
+  - [MCPとは？](#mcpとは)
+  - [MCPサーバー設定](#mcpサーバー設定)
+  - [利用可能なMCPサーバー](#利用可能なmcpサーバー)
+  - [MCP状態監視](#mcp状態監視)
+- [設定ガイド](#設定ガイド)
+  - [基本設定パラメータ](#基本設定パラメータ)
+  - [カスタムAIプロバイダー設定](#カスタムaiプロバイダー設定)
+  - [履歴設定](#履歴設定)
+  - [設定例](#設定例)
+  - [完全設定例](#完全設定例)
+  - [カスタム指示](#カスタム指示)
+  - [環境変数の設定](#環境変数の設定)
 - [FAQ](#faq)
-- [Zero data retention (ZDR) usage](#zero-data-retention-zdr-usage)
-- [Codex open source fund](#codex-open-source-fund)
-- [Contributing](#contributing)
-  - [Development workflow](#development-workflow)
-  - [Git hooks with Husky](#git-hooks-with-husky)
-  - [Debugging](#debugging)
-  - [Writing high-impact code changes](#writing-high-impact-code-changes)
-  - [Opening a pull request](#opening-a-pull-request)
-  - [Review process](#review-process)
-  - [Community values](#community-values)
-  - [Getting help](#getting-help)
-  - [Contributor license agreement (CLA)](#contributor-license-agreement-cla)
-    - [Quick fixes](#quick-fixes)
-  - [Releasing `codex`](#releasing-codex)
-  - [Alternative build options](#alternative-build-options)
-    - [Nix flake development](#nix-flake-development)
-- [Security & responsible AI](#security--responsible-ai)
-- [License](#license)
+- [ゼロデータ保持（ZDR）の使用](#ゼロデータ保持zdrの使用)
+- [Codexオープンソースファンド](#codexオープンソースファンド)
+- [貢献](#貢献)
+  - [開発ワークフロー](#開発ワークフロー)
+  - [Huskyを使用したGitフック](#huskyを使用したgitフック)
+  - [デバッグ](#デバッグ)
+  - [高インパクトなコード変更の作成](#高インパクトなコード変更の作成)
+  - [プルリクエストの作成](#プルリクエストの作成)
+  - [レビュープロセス](#レビュープロセス)
+  - [コミュニティの価値観](#コミュニティの価値観)
+  - [ヘルプの取得](#ヘルプの取得)
+  - [貢献者ライセンス契約（CLA）](#貢献者ライセンス契約cla)
+    - [クイックフィックス](#クイックフィックス)
+  - [Codexのリリース](#codexのリリース)
+  - [代替ビルドオプション](#代替ビルドオプション)
+    - [Nix flake開発](#nix-flake開発)
+- [セキュリティと責任あるAI](#セキュリティと責任あるai)
+- [ライセンス](#ライセンス)
 
 <!-- End ToC -->
 
@@ -58,45 +63,45 @@
 
 ---
 
-## Experimental technology disclaimer
+## 実験的技術に関する免責事項
 
-Codex CLI is an experimental project under active development. It is not yet stable, may contain bugs, incomplete features, or undergo breaking changes. We're building it in the open with the community and welcome:
+Codex CLIは活発に開発中の実験的プロジェクトです。まだ安定していないため、バグ、未完成の機能、または破壊的な変更が含まれる可能性があります。私たちはコミュニティと一緒にオープンに開発しており、以下を歓迎します：
 
-- Bug reports
-- Feature requests
-- Pull requests
-- Good vibes
+- バグレポート
+- 機能リクエスト
+- プルリクエスト
+- 良い雰囲気
 
-Help us improve by filing issues or submitting PRs (see the section below for how to contribute)!
+課題を報告したりPRを提出したりして、改善にご協力ください（貢献方法については以下のセクションをご覧ください）！
 
-## Quickstart
+## クイックスタート
 
-Install globally:
+グローバルインストール：
 
 ```shell
 npm install -g @openai/codex
 ```
 
-Next, set your OpenAI API key as an environment variable:
+次に、OpenAI APIキーを環境変数として設定します：
 
 ```shell
 export OPENAI_API_KEY="your-api-key-here"
 ```
 
-> **Note:** This command sets the key only for your current terminal session. You can add the `export` line to your shell's configuration file (e.g., `~/.zshrc`) but we recommend setting for the session. **Tip:** You can also place your API key into a `.env` file at the root of your project:
+> **注意：** このコマンドは現在のターミナルセッションでのみキーを設定します。シェルの設定ファイル（例：`~/.zshrc`）に`export`行を追加できますが、セッション用に設定することを推奨します。**ヒント：** プロジェクトのルートに`.env`ファイルを作成してAPIキーを配置することもできます：
 >
 > ```env
 > OPENAI_API_KEY=your-api-key-here
 > ```
 >
-> The CLI will automatically load variables from `.env` (via `dotenv/config`).
+> CLIは`.env`から変数を自動的に読み込みます（`dotenv/config`経由）。
 
 <details>
-<summary><strong>Use <code>--provider</code> to use other models</strong></summary>
+<summary><strong><code>--provider</code>を使用して他のモデルを使用</strong></summary>
 
-> Codex also allows you to use other providers that support the OpenAI Chat Completions API. You can set the provider in the config file or use the `--provider` flag. The possible options for `--provider` are:
+> Codexでは、OpenAI Chat Completions APIをサポートする他のプロバイダーを使用することもできます。プロバイダーは設定ファイルで設定するか、`--provider`フラグを使用できます。`--provider`の可能なオプションは：
 >
-> - openai (default)
+> - openai (デフォルト)
 > - openrouter
 > - azure
 > - gemini
@@ -106,15 +111,15 @@ export OPENAI_API_KEY="your-api-key-here"
 > - xai
 > - groq
 > - arceeai
-> - any other provider that is compatible with the OpenAI API
+> - OpenAI APIと互換性のある他のプロバイダー
 >
-> If you use a provider other than OpenAI, you will need to set the API key for the provider in the config file or in the environment variable as:
+> OpenAI以外のプロバイダーを使用する場合、設定ファイルまたは環境変数でプロバイダーのAPIキーを設定する必要があります：
 >
 > ```shell
 > export <provider>_API_KEY="your-api-key-here"
 > ```
 >
-> If you use a provider not listed above, you must also set the base URL for the provider:
+> 上記にリストされていないプロバイダーを使用する場合、プロバイダーのベースURLも設定する必要があります：
 >
 > ```shell
 > export <provider>_BASE_URL="https://your-provider-api-base-url"
@@ -123,138 +128,121 @@ export OPENAI_API_KEY="your-api-key-here"
 </details>
 <br />
 
-Run interactively:
+対話モードで実行：
 
 ```shell
 codex
 ```
 
-Or, run with a prompt as input (and optionally in `Full Auto` mode):
+または、プロンプトを入力として実行（オプションで`Full Auto`モードで）：
 
 ```shell
-codex "explain this codebase to me"
+codex "このコードベースを説明してください"
 ```
 
 ```shell
-codex --approval-mode full-auto "create the fanciest todo-list app"
+codex --approval-mode full-auto "最高にファンシーなtodo-listアプリを作成"
 ```
 
-That's it - Codex will scaffold a file, run it inside a sandbox, install any
-missing dependencies, and show you the live result. Approve the changes and
-they'll be committed to your working directory.
+これだけです - Codexはファイルをスキャフォールドし、サンドボックス内で実行し、不足している依存関係をインストールし、ライブ結果を表示します。変更を承認すると、作業ディレクトリにコミットされます。
 
 ---
 
-## Why Codex?
+## なぜCodex？
 
-Codex CLI is built for developers who already **live in the terminal** and want
-ChatGPT-level reasoning **plus** the power to actually run code, manipulate
-files, and iterate - all under version control. In short, it's _chat-driven
-development_ that understands and executes your repo.
+Codex CLIは、すでに**ターミナルで生活している**開発者向けに構築されており、ChatGPTレベルの推論**と**実際にコードを実行し、ファイルを操作し、反復する力を求めています - すべてバージョン管理下で。簡単に言うと、リポジトリを理解し実行する*チャット駆動開発*です。
 
-- **Zero setup** - bring your OpenAI API key and it just works!
-- **Full auto-approval, while safe + secure** by running network-disabled and directory-sandboxed
-- **Multimodal** - pass in screenshots or diagrams to implement features ✨
+- **ゼロ設定** - OpenAI APIキーを持参するだけで動作します！
+- **完全自動承認、安全でセキュア** - ネットワークを無効化し、ディレクトリをサンドボックス化して実行
+- **マルチモーダル** - スクリーンショットや図を渡して機能を実装 ✨
 
-And it's **fully open-source** so you can see and contribute to how it develops!
+そして**完全オープンソース**なので、どのように開発されているかを見て貢献できます！
 
 ---
 
-## Security model & permissions
+## セキュリティモデルと権限
 
-Codex lets you decide _how much autonomy_ the agent receives and auto-approval policy via the
-`--approval-mode` flag (or the interactive onboarding prompt):
+Codexでは、`--approval-mode`フラグ（または対話式オンボーディングプロンプト）を使用して、エージェントが受け取る*自律性の程度*と自動承認ポリシーを決定できます：
 
-| Mode                      | What the agent may do without asking                                                                | Still requires approval                                                                         |
-| ------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| **Suggest** <br>(default) | <li>Read any file in the repo                                                                       | <li>**All** file writes/patches<li> **Any** arbitrary shell commands (aside from reading files) |
-| **Auto Edit**             | <li>Read **and** apply-patch writes to files                                                        | <li>**All** shell commands                                                                      |
-| **Full Auto**             | <li>Read/write files <li> Execute shell commands (network disabled, writes limited to your workdir) | -                                                                                               |
+| モード                       | エージェントが許可なしに実行できること                                                                          | まだ承認が必要なもの                                                                                 |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Suggest** <br>(デフォルト) | <li>リポジトリ内の任意のファイルを読み取り                                                                      | <li>**すべての**ファイル書き込み/パッチ<li> **すべての**任意のシェルコマンド（ファイル読み取り以外） |
+| **Auto Edit**                | <li>ファイルの読み取り**および**パッチ適用書き込み                                                              | <li>**すべての**シェルコマンド                                                                       |
+| **Full Auto**                | <li>ファイルの読み取り/書き込み <li> シェルコマンドの実行（ネットワーク無効、書き込みは作業ディレクトリに制限） | -                                                                                                    |
 
-In **Full Auto** every command is run **network-disabled** and confined to the
-current working directory (plus temporary files) for defense-in-depth. Codex
-will also show a warning/confirmation if you start in **auto-edit** or
-**full-auto** while the directory is _not_ tracked by Git, so you always have a
-safety net.
+**Full Auto**では、すべてのコマンドが**ネットワーク無効**で実行され、現在の作業ディレクトリ（および一時ファイル）に制限されて、多層防御が提供されます。また、Codexは、ディレクトリがGitで追跡されて*いない*間に**auto-edit**または**full-auto**で開始する場合、警告/確認を表示するため、常に安全網があります。
 
-Coming soon: you'll be able to whitelist specific commands to auto-execute with
-the network enabled, once we're confident in additional safeguards.
+近日公開予定：追加の保護手段に自信を持った後、ネットワークを有効にして自動実行する特定のコマンドをホワイトリスト化できるようになります。
 
-### Platform sandboxing details
+### プラットフォームサンドボックスの詳細
 
-The hardening mechanism Codex uses depends on your OS:
+CodexがOS使用する強化メカニズムは以下に依存します：
 
-- **macOS 12+** - commands are wrapped with **Apple Seatbelt** (`sandbox-exec`).
+- **macOS 12+** - コマンドは**Apple Seatbelt**（`sandbox-exec`）でラップされます。
 
-  - Everything is placed in a read-only jail except for a small set of
-    writable roots (`$PWD`, `$TMPDIR`, `~/.codex`, etc.).
-  - Outbound network is _fully blocked_ by default - even if a child process
-    tries to `curl` somewhere it will fail.
+  - 少数の書き込み可能ルート（`$PWD`、`$TMPDIR`、`~/.codex`など）を除いて、すべてが読み取り専用ジェイルに配置されます。
+  - 送信ネットワークは*デフォルトで完全にブロック*されます - 子プロセスがどこかに`curl`しようとしても失敗します。
 
-- **Linux** - there is no sandboxing by default.
-  We recommend using Docker for sandboxing, where Codex launches itself inside a **minimal
-  container image** and mounts your repo _read/write_ at the same path. A
-  custom `iptables`/`ipset` firewall script denies all egress except the
-  OpenAI API. This gives you deterministic, reproducible runs without needing
-  root on the host. You can use the [`run_in_container.sh`](./codex-cli/scripts/run_in_container.sh) script to set up the sandbox.
+- **Linux** - デフォルトではサンドボックス化はありません。
+  Dockerを使用したサンドボックス化をお勧めします。Codexが**最小限のコンテナイメージ**内で自分自身を起動し、リポジトリを同じパスで*読み取り/書き込み*マウントします。カスタム`iptables`/`ipset`ファイアウォールスクリプトがOpenAI API以外のすべての送信を拒否します。これにより、ホストでrootが不要で、決定論的で再現可能な実行が提供されます。[`run_in_container.sh`](./codex-cli/scripts/run_in_container.sh)スクリプトを使用してサンドボックスを設定できます。
 
 ---
 
-## System requirements
+## システム要件
 
-| Requirement                 | Details                                                         |
-| --------------------------- | --------------------------------------------------------------- |
-| Operating systems           | macOS 12+, Ubuntu 20.04+/Debian 10+, or Windows 11 **via WSL2** |
-| Node.js                     | **22 or newer** (LTS recommended)                               |
-| Git (optional, recommended) | 2.23+ for built-in PR helpers                                   |
-| RAM                         | 4-GB minimum (8-GB recommended)                                 |
+| 要件                     | 詳細                                                                |
+| ------------------------ | ------------------------------------------------------------------- |
+| オペレーティングシステム | macOS 12+、Ubuntu 20.04+/Debian 10+、または**WSL2経由**のWindows 11 |
+| Node.js                  | **22以降**（LTS推奨）                                               |
+| Git（オプション、推奨）  | 2.23+（内蔵PRヘルパー用）                                           |
+| RAM                      | 4GB最小（8GB推奨）                                                  |
 
-> Never run `sudo npm install -g`; fix npm permissions instead.
-
----
-
-## CLI reference
-
-| Command                              | Purpose                             | Example                              |
-| ------------------------------------ | ----------------------------------- | ------------------------------------ |
-| `codex`                              | Interactive REPL                    | `codex`                              |
-| `codex "..."`                        | Initial prompt for interactive REPL | `codex "fix lint errors"`            |
-| `codex -q "..."`                     | Non-interactive "quiet mode"        | `codex -q --json "explain utils.ts"` |
-| `codex completion <bash\|zsh\|fish>` | Print shell completion script       | `codex completion bash`              |
-
-Key flags: `--model/-m`, `--approval-mode/-a`, `--quiet/-q`, and `--notify`.
+> `sudo npm install -g`は実行しないでください；代わりにnpmの権限を修正してください。
 
 ---
 
-## Memory & project docs
+## CLIリファレンス
 
-You can give Codex extra instructions and guidance using `AGENTS.md` files. Codex looks for `AGENTS.md` files in the following places, and merges them top-down:
+| コマンド                             | 目的                       | 例                                 |
+| ------------------------------------ | -------------------------- | ---------------------------------- |
+| `codex`                              | 対話REPL                   | `codex`                            |
+| `codex "..."`                        | 対話REPLの初期プロンプト   | `codex "lintエラーを修正"`         |
+| `codex -q "..."`                     | 非対話「静音モード」       | `codex -q --json "utils.tsを説明"` |
+| `codex completion <bash\|zsh\|fish>` | シェル補完スクリプトを印刷 | `codex completion bash`            |
 
-1. `~/.codex/AGENTS.md` - personal global guidance
-2. `AGENTS.md` at repo root - shared project notes
-3. `AGENTS.md` in the current working directory - sub-folder/feature specifics
-
-Disable loading of these files with `--no-project-doc` or the environment variable `CODEX_DISABLE_PROJECT_DOC=1`.
+主要フラグ：`--model/-m`、`--approval-mode/-a`、`--quiet/-q`、`--notify`。
 
 ---
 
-## Non-interactive / CI mode
+## メモリとプロジェクトドキュメント
 
-Run Codex head-less in pipelines. Example GitHub Action step:
+`AGENTS.md`ファイルを使用してCodexに追加の指示とガイダンスを提供できます。Codexは以下の場所で`AGENTS.md`ファイルを探し、上から下にマージします：
+
+1. `~/.codex/AGENTS.md` - 個人的なグローバルガイダンス
+2. リポジトリルートの`AGENTS.md` - 共有プロジェクトノート
+3. 現在の作業ディレクトリの`AGENTS.md` - サブフォルダ/機能固有
+
+`--no-project-doc`または環境変数`CODEX_DISABLE_PROJECT_DOC=1`でこれらのファイルの読み込みを無効にします。
+
+---
+
+## 非対話/CIモード
+
+パイプラインでCodexをヘッドレスで実行します。GitHub Actionステップの例：
 
 ```yaml
-- name: Update changelog via Codex
+- name: Codexを使用してchangelogを更新
   run: |
     npm install -g @openai/codex
     export OPENAI_API_KEY="${{ secrets.OPENAI_KEY }}"
-    codex -a auto-edit --quiet "update CHANGELOG for next release"
+    codex -a auto-edit --quiet "次のリリース用にCHANGELOGを更新"
 ```
 
-Set `CODEX_QUIET_MODE=1` to silence interactive UI noise.
+`CODEX_QUIET_MODE=1`を設定して対話UIノイズを無音にします。
 
-## Tracing / verbose logging
+## トレース/詳細ログ
 
-Setting the environment variable `DEBUG=true` prints full API request and response details:
+環境変数`DEBUG=true`を設定すると、完全なAPIリクエストとレスポンスの詳細が印刷されます：
 
 ```shell
 DEBUG=true codex
@@ -262,64 +250,64 @@ DEBUG=true codex
 
 ---
 
-## Recipes
+## レシピ
 
-Below are a few bite-size examples you can copy-paste. Replace the text in quotes with your own task. See the [prompting guide](https://github.com/openai/codex/blob/main/codex-cli/examples/prompting_guide.md) for more tips and usage patterns.
+以下は、コピーペーストできるいくつかの小さな例です。引用符内のテキストを独自のタスクに置き換えてください。詳細なヒントと使用パターンについては、[プロンプトガイド](https://github.com/openai/codex/blob/main/codex-cli/examples/prompting_guide.md)をご覧ください。
 
-| ✨  | What you type                                                                   | What happens                                                               |
-| --- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| 1   | `codex "Refactor the Dashboard component to React Hooks"`                       | Codex rewrites the class component, runs `npm test`, and shows the diff.   |
-| 2   | `codex "Generate SQL migrations for adding a users table"`                      | Infers your ORM, creates migration files, and runs them in a sandboxed DB. |
-| 3   | `codex "Write unit tests for utils/date.ts"`                                    | Generates tests, executes them, and iterates until they pass.              |
-| 4   | `codex "Bulk-rename *.jpeg -> *.jpg with git mv"`                               | Safely renames files and updates imports/usages.                           |
-| 5   | `codex "Explain what this regex does: ^(?=.*[A-Z]).{8,}$"`                      | Outputs a step-by-step human explanation.                                  |
-| 6   | `codex "Carefully review this repo, and propose 3 high impact well-scoped PRs"` | Suggests impactful PRs in the current codebase.                            |
-| 7   | `codex "Look for vulnerabilities and create a security review report"`          | Finds and explains security bugs.                                          |
+| ✨  | 入力内容                                                                                    | 動作内容                                                                |
+| --- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| 1   | `codex "DashboardコンポーネントをReact Hooksにリファクタリング"`                            | Codexがクラスコンポーネントを書き直し、`npm test`を実行し、差分を表示。 |
+| 2   | `codex "ユーザーテーブル追加用のSQLマイグレーションを生成"`                                 | ORMを推測し、マイグレーションファイルを作成し、サンドボックスDBで実行。 |
+| 3   | `codex "utils/date.tsのユニットテストを作成"`                                               | テストを生成し、実行し、合格するまで反復。                              |
+| 4   | `codex "git mvで*.jpegを*.jpgに一括リネーム"`                                               | ファイルを安全にリネームし、インポート/使用箇所を更新。                 |
+| 5   | `codex "この正規表現の動作を説明：^(?=.*[A-Z]).{8,}$"`                                      | ステップバイステップの人間向け説明を出力。                              |
+| 6   | `codex "このリポジトリを慎重にレビューし、3つの高インパクトで適切にスコープされたPRを提案"` | 現在のコードベースで影響力のあるPRを提案。                              |
+| 7   | `codex "脆弱性を探し、セキュリティレビューレポートを作成"`                                  | セキュリティバグを発見し説明。                                          |
 
 ---
 
-## Installation
+## インストール
 
 <details open>
-<summary><strong>From npm (Recommended)</strong></summary>
+<summary><strong>npmから（推奨）</strong></summary>
 
 ```bash
 npm install -g @openai/codex
-# or
+# または
 yarn global add @openai/codex
-# or
+# または
 bun install -g @openai/codex
-# or
+# または
 pnpm add -g @openai/codex
 ```
 
 </details>
 
 <details>
-<summary><strong>Build from source</strong></summary>
+<summary><strong>ソースからビルド</strong></summary>
 
 ```bash
-# Clone the repository and navigate to the CLI package
+# リポジトリをクローンしてCLIパッケージに移動
 git clone https://github.com/openai/codex.git
 cd codex/codex-cli
 
-# Enable corepack
+# corepackを有効にする
 corepack enable
 
-# Install dependencies and build
+# 依存関係をインストールしてビルド
 pnpm install
 pnpm build
 
-# Linux-only: download prebuilt sandboxing binaries (requires gh and zstd).
+# Linux専用：事前ビルドされたサンドボックスバイナリをダウンロード（ghとzstdが必要）。
 ./scripts/install_native_deps.sh
 
-# Get the usage and the options
+# 使用法とオプションを取得
 node ./dist/cli.js --help
 
-# Run the locally-built CLI directly
+# ローカルビルドされたCLIを直接実行
 node ./dist/cli.js
 
-# Or link the command globally for convenience
+# または便利なようにコマンドをグローバルにリンク
 pnpm link
 ```
 
@@ -327,42 +315,127 @@ pnpm link
 
 ---
 
-## Configuration guide
+## MCP（Model Control Protocol）統合
 
-Codex configuration files can be placed in the `~/.codex/` directory, supporting both YAML and JSON formats.
+Codex CLIは**Model Control Protocol（MCP）**をサポートしており、外部サーバーに接続して専用ツールと機能を提供することで、エージェントの機能を拡張します。
 
-### Basic configuration parameters
+### MCPとは？
 
-| Parameter           | Type    | Default    | Description                      | Available Options                                                                              |
-| ------------------- | ------- | ---------- | -------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `model`             | string  | `o4-mini`  | AI model to use                  | Any model name supporting OpenAI API                                                           |
-| `approvalMode`      | string  | `suggest`  | AI assistant's permission mode   | `suggest` (suggestions only)<br>`auto-edit` (automatic edits)<br>`full-auto` (fully automatic) |
-| `fullAutoErrorMode` | string  | `ask-user` | Error handling in full-auto mode | `ask-user` (prompt for user input)<br>`ignore-and-continue` (ignore and proceed)               |
-| `notify`            | boolean | `true`     | Enable desktop notifications     | `true`/`false`                                                                                 |
+MCP（Model Control Protocol）は、Codexが外部サーバーに接続してそのツールにアクセスできるようにする標準化されたプロトコルです。これにより以下との統合が可能になります：
 
-### Custom AI provider configuration
+- **データベース**（PostgreSQL、MongoDBなど）
+- **APIとサービス**（GitHub、JIRA、Slackなど）
+- **ファイルシステム**とストレージサービス
+- 永続的コンテキストのための**メモリシステム**
+- **カスタムビジネスロジック**とドメイン固有ツール
 
-In the `providers` object, you can configure multiple AI service providers. Each provider requires the following parameters:
+### MCPサーバー設定
 
-| Parameter | Type   | Description                             | Example                       |
-| --------- | ------ | --------------------------------------- | ----------------------------- |
-| `name`    | string | Display name of the provider            | `"OpenAI"`                    |
-| `baseURL` | string | API service URL                         | `"https://api.openai.com/v1"` |
-| `envKey`  | string | Environment variable name (for API key) | `"OPENAI_API_KEY"`            |
+`~/.codex/config.json`または`~/.codex/config.yaml`ファイルでMCPサーバーを設定します：
 
-### History configuration
+```json
+{
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "filesystem": {
+      "command": "python",
+      "args": ["-m", "mcp_server.filesystem"],
+      "env": {
+        "ROOT_PATH": "/path/to/allowed/directory"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
 
-In the `history` object, you can configure conversation history settings:
+**設定パラメータ：**
 
-| Parameter           | Type    | Description                                            | Example Value |
-| ------------------- | ------- | ------------------------------------------------------ | ------------- |
-| `maxSize`           | number  | Maximum number of history entries to save              | `1000`        |
-| `saveHistory`       | boolean | Whether to save history                                | `true`        |
-| `sensitivePatterns` | array   | Patterns of sensitive information to filter in history | `[]`          |
+| パラメータ | タイプ | 説明                               | 例                                              |
+| ---------- | ------ | ---------------------------------- | ----------------------------------------------- |
+| `command`  | string | サーバーを開始する実行可能コマンド | `"npx"`、`"python"`                             |
+| `args`     | array  | コマンドライン引数                 | `["-y", "@modelcontextprotocol/server-memory"]` |
+| `env`      | object | サーバー用の環境変数               | `{"API_KEY": "value"}`                          |
+| `url`      | string | リモートサーバーURL（SSE接続用）   | `"https://api.example.com/mcp"`                 |
 
-### Configuration examples
+### 利用可能なMCPサーバー
 
-1. YAML format (save as `~/.codex/config.yaml`):
+統合できる人気のMCPサーバー：
+
+- **[@modelcontextprotocol/server-memory](https://www.npmjs.com/package/@modelcontextprotocol/server-memory)** - 永続メモリとコンテキスト
+- **[@modelcontextprotocol/server-filesystem](https://www.npmjs.com/package/@modelcontextprotocol/server-filesystem)** - ファイルシステム操作
+- **[@modelcontextprotocol/server-github](https://www.npmjs.com/package/@modelcontextprotocol/server-github)** - GitHub統合
+- **[@modelcontextprotocol/server-postgres](https://www.npmjs.com/package/@modelcontextprotocol/server-postgres)** - PostgreSQLデータベースアクセス
+- **[@modelcontextprotocol/server-sqlite](https://www.npmjs.com/package/@modelcontextprotocol/server-sqlite)** - SQLiteデータベース操作
+
+完全なリストについては、[MCPサーバーディレクトリ](https://github.com/modelcontextprotocol/servers)をご覧ください。
+
+### MCP状態監視
+
+MCPサーバーが設定されると、Codexは接続状態を表示します：
+
+- **接続されたサーバー**は✅で表示
+- **切断されたサーバー**は❌で表示
+- CLIで`Ctrl+M`を使用して詳細なMCPサーバー状態を表示
+
+**状態表示の例：**
+
+```
+MCPサーバー状態:
+✅ memory (3つのツールが利用可能)
+✅ github (12のツールが利用可能)
+❌ database (接続失敗)
+```
+
+AIアシスタントは、リクエストに関連する場合、接続されたMCPサーバーのツールを自動的に使用します。
+
+---
+
+## 設定ガイド
+
+Codex設定ファイルは`~/.codex/`ディレクトリに配置でき、YAMLとJSON形式の両方をサポートします。
+
+### 基本設定パラメータ
+
+| パラメータ          | タイプ  | デフォルト | 説明                          | 利用可能オプション                                                          |
+| ------------------- | ------- | ---------- | ----------------------------- | --------------------------------------------------------------------------- |
+| `model`             | string  | `o4-mini`  | 使用するAIモデル              | OpenAI APIをサポートする任意のモデル名                                      |
+| `approvalMode`      | string  | `suggest`  | AIアシスタントの権限モード    | `suggest`（提案のみ）<br>`auto-edit`（自動編集）<br>`full-auto`（完全自動） |
+| `fullAutoErrorMode` | string  | `ask-user` | full-autoモードでのエラー処理 | `ask-user`（ユーザー入力を要求）<br>`ignore-and-continue`（無視して続行）   |
+| `notify`            | boolean | `true`     | デスクトップ通知を有効にする  | `true`/`false`                                                              |
+
+### カスタムAIプロバイダー設定
+
+`providers`オブジェクトで、複数のAIサービスプロバイダーを設定できます。各プロバイダーには以下のパラメータが必要です：
+
+| パラメータ | タイプ | 説明                    | 例                            |
+| ---------- | ------ | ----------------------- | ----------------------------- |
+| `name`     | string | プロバイダーの表示名    | `"OpenAI"`                    |
+| `baseURL`  | string | APIサービスURL          | `"https://api.openai.com/v1"` |
+| `envKey`   | string | 環境変数名（APIキー用） | `"OPENAI_API_KEY"`            |
+
+### 履歴設定
+
+`history`オブジェクトで、会話履歴設定を構成できます：
+
+| パラメータ          | タイプ  | 説明                                     | 例の値 |
+| ------------------- | ------- | ---------------------------------------- | ------ |
+| `maxSize`           | number  | 保存する履歴エントリの最大数             | `1000` |
+| `saveHistory`       | boolean | 履歴を保存するかどうか                   | `true` |
+| `sensitivePatterns` | array   | 履歴でフィルタリングする機密情報パターン | `[]`   |
+
+### 設定例
+
+1. YAML形式（`~/.codex/config.yaml`として保存）：
 
 ```yaml
 model: o4-mini
@@ -371,7 +444,7 @@ fullAutoErrorMode: ask-user
 notify: true
 ```
 
-2. JSON format (save as `~/.codex/config.json`):
+2. JSON形式（`~/.codex/config.json`として保存）：
 
 ```json
 {
@@ -382,9 +455,9 @@ notify: true
 }
 ```
 
-### Full configuration example
+### 完全設定例
 
-Below is a comprehensive example of `config.json` with multiple custom providers:
+複数のカスタムプロバイダーを使用した`config.json`の包括的な例：
 
 ```json
 {
@@ -450,18 +523,18 @@ Below is a comprehensive example of `config.json` with multiple custom providers
 }
 ```
 
-### Custom instructions
+### カスタム指示
 
-You can create a `~/.codex/AGENTS.md` file to define custom guidance for the agent:
+エージェント用のカスタムガイダンスを定義するために、`~/.codex/AGENTS.md`ファイルを作成できます：
 
 ```markdown
-- Always respond with emojis
-- Only use git commands when explicitly requested
+- 常に絵文字で応答する
+- 明示的に要求された場合のみgitコマンドを使用する
 ```
 
-### Environment variables setup
+### 環境変数の設定
 
-For each AI provider, you need to set the corresponding API key in your environment variables. For example:
+各AIプロバイダーについて、環境変数で対応するAPIキーを設定する必要があります。例：
 
 ```bash
 # OpenAI
@@ -469,12 +542,12 @@ export OPENAI_API_KEY="your-api-key-here"
 
 # Azure OpenAI
 export AZURE_OPENAI_API_KEY="your-azure-api-key-here"
-export AZURE_OPENAI_API_VERSION="2025-03-01-preview" (Optional)
+export AZURE_OPENAI_API_VERSION="2025-03-01-preview" (オプション)
 
 # OpenRouter
 export OPENROUTER_API_KEY="your-openrouter-key-here"
 
-# Similarly for other providers
+# 他のプロバイダーも同様
 ```
 
 ---
@@ -482,236 +555,234 @@ export OPENROUTER_API_KEY="your-openrouter-key-here"
 ## FAQ
 
 <details>
-<summary>OpenAI released a model called Codex in 2021 - is this related?</summary>
+<summary>OpenAIは2021年にCodexというモデルをリリースしました - これは関連していますか？</summary>
 
-In 2021, OpenAI released Codex, an AI system designed to generate code from natural language prompts. That original Codex model was deprecated as of March 2023 and is separate from the CLI tool.
-
-</details>
-
-<details>
-<summary>Which models are supported?</summary>
-
-Any model available with [Responses API](https://platform.openai.com/docs/api-reference/responses). The default is `o4-mini`, but pass `--model gpt-4.1` or set `model: gpt-4.1` in your config file to override.
-
-</details>
-<details>
-<summary>Why does <code>o3</code> or <code>o4-mini</code> not work for me?</summary>
-
-It's possible that your [API account needs to be verified](https://help.openai.com/en/articles/10910291-api-organization-verification) in order to start streaming responses and seeing chain of thought summaries from the API. If you're still running into issues, please let us know!
+2021年、OpenAIは自然言語プロンプトからコードを生成するように設計されたAIシステムであるCodexをリリースしました。その元のCodexモデルは2023年3月に廃止され、このCLIツールとは別物です。
 
 </details>
 
 <details>
-<summary>How do I stop Codex from editing my files?</summary>
+<summary>どのモデルがサポートされていますか？</summary>
 
-Codex runs model-generated commands in a sandbox. If a proposed command or file change doesn't look right, you can simply type **n** to deny the command or give the model feedback.
+[Responses API](https://platform.openai.com/docs/api-reference/responses)で利用可能なすべてのモデル。デフォルトは`o4-mini`ですが、`--model gpt-4.1`を渡すか、設定ファイルで`model: gpt-4.1`を設定してオーバーライドします。
 
 </details>
 <details>
-<summary>Does it work on Windows?</summary>
+<summary>なぜ<code>o3</code>や<code>o4-mini</code>が機能しないのですか？</summary>
 
-Not directly. It requires [Windows Subsystem for Linux (WSL2)](https://learn.microsoft.com/en-us/windows/wsl/install) - Codex has been tested on macOS and Linux with Node 22.
+APIからのレスポンスのストリーミングと思考の連鎖の概要の表示を開始するために、[APIアカウントの認証](https://help.openai.com/en/articles/10910291-api-organization-verification)が必要な可能性があります。問題が解決しない場合はお知らせください！
+
+</details>
+
+<details>
+<summary>Codexがファイルを編集しないようにするにはどうすればよいですか？</summary>
+
+Codexはモデル生成されたコマンドをサンドボックス内で実行します。提案されたコマンドやファイル変更が正しくない場合、単に**n**と入力してコマンドを拒否したり、モデルにフィードバックを与えることができます。
+
+</details>
+<details>
+<summary>Windowsで動作しますか？</summary>
+
+直接的にはありません。[Windows Subsystem for Linux（WSL2）](https://learn.microsoft.com/en-us/windows/wsl/install)が必要です - CodexはmacOSとLinuxでNode 22を使用してテストされています。
 
 </details>
 
 ---
 
-## Zero data retention (ZDR) usage
+## ゼロデータ保持（ZDR）の使用
 
-Codex CLI **does** support OpenAI organizations with [Zero Data Retention (ZDR)](https://platform.openai.com/docs/guides/your-data#zero-data-retention) enabled. If your OpenAI organization has Zero Data Retention enabled and you still encounter errors such as:
+Codex CLIは[Zero Data Retention（ZDR）](https://platform.openai.com/docs/guides/your-data#zero-data-retention)が有効になっているOpenAI組織を**サポート**しています。OpenAI組織でZero Data Retentionが有効になっていて、次のようなエラーが発生する場合：
 
 ```
 OpenAI rejected the request. Error details: Status: 400, Code: unsupported_parameter, Type: invalid_request_error, Message: 400 Previous response cannot be used for this organization due to Zero Data Retention.
 ```
 
-You may need to upgrade to a more recent version with: `npm i -g @openai/codex@latest`
+次のコマンドでより新しいバージョンにアップグレードする必要がある場合があります：`npm i -g @openai/codex@latest`
 
 ---
 
-## Codex open source fund
+## Codexオープンソースファンド
 
-We're excited to launch a **$1 million initiative** supporting open source projects that use Codex CLI and other OpenAI models.
+Codex CLIやその他のOpenAIモデルを使用するオープンソースプロジェクトをサポートする**100万ドルのイニシアチブ**を開始することを嬉しく思います。
 
-- Grants are awarded up to **$25,000** API credits.
-- Applications are reviewed **on a rolling basis**.
+- 助成金は**最大25,000ドル**のAPIクレジットで授与されます。
+- 申請は**随時レビュー**されます。
 
-**Interested? [Apply here](https://openai.com/form/codex-open-source-fund/).**
+**興味がありますか？[こちらから申請してください](https://openai.com/form/codex-open-source-fund/)。**
 
 ---
 
-## Contributing
+## 貢献
 
-This project is under active development and the code will likely change pretty significantly. We'll update this message once that's complete!
+このプロジェクトは積極的に開発中で、コードは大幅に変更される可能性があります。それが完了したらこのメッセージを更新します！
 
-More broadly we welcome contributions - whether you are opening your very first pull request or you're a seasoned maintainer. At the same time we care about reliability and long-term maintainability, so the bar for merging code is intentionally **high**. The guidelines below spell out what "high-quality" means in practice and should make the whole process transparent and friendly.
+より広く、私たちは貢献を歓迎します - 初回のプルリクエストを開く場合でも、経験豊富なメンテナーでも。同時に、信頼性と長期的な保守性を重視しているため、コードをマージする基準は意図的に**高く**設定されています。以下のガイドラインは、実際に「高品質」が何を意味するかを明確にし、プロセス全体を透明で友好的にするはずです。
 
-### Development workflow
+### 開発ワークフロー
 
-- Create a _topic branch_ from `main` - e.g. `feat/interactive-prompt`.
-- Keep your changes focused. Multiple unrelated fixes should be opened as separate PRs.
-- Use `pnpm test:watch` during development for super-fast feedback.
-- We use **Vitest** for unit tests, **ESLint** + **Prettier** for style, and **TypeScript** for type-checking.
-- Before pushing, run the full test/type/lint suite:
+- `main`から*トピックブランチ*を作成 - 例：`feat/interactive-prompt`。
+- 変更に焦点を当てる。複数の無関係な修正は別々のPRとして開く。
+- 開発中は`pnpm test:watch`を使用して超高速フィードバックを得る。
+- 単体テストには**Vitest**、スタイルには**ESLint** + **Prettier**、型チェックには**TypeScript**を使用。
+- プッシュ前に、完全なテスト/型/リントスイートを実行：
 
-### Git hooks with Husky
+### Huskyを使用したGitフック
 
-This project uses [Husky](https://typicode.github.io/husky/) to enforce code quality checks:
+このプロジェクトは[Husky](https://typicode.github.io/husky/)を使用してコード品質チェックを強制します：
 
-- **Pre-commit hook**: Automatically runs lint-staged to format and lint files before committing
-- **Pre-push hook**: Runs tests and type checking before pushing to the remote
+- **プリコミットフック**：コミット前にlint-stagedを自動実行してファイルをフォーマットおよびリント
+- **プリプッシュフック**：リモートにプッシュする前にテストと型チェックを実行
 
-These hooks help maintain code quality and prevent pushing code with failing tests. For more details, see [HUSKY.md](./codex-cli/HUSKY.md).
+これらのフックはコード品質を維持し、失敗したテストでコードをプッシュすることを防ぎます。詳細については、[HUSKY.md](./codex-cli/HUSKY.md)をご覧ください。
 
 ```bash
 pnpm test && pnpm run lint && pnpm run typecheck
 ```
 
-- If you have **not** yet signed the Contributor License Agreement (CLA), add a PR comment containing the exact text
+- **まだ**貢献者ライセンス契約（CLA）に署名していない場合は、正確なテキストを含むPRコメントを追加してください
 
   ```text
   I have read the CLA Document and I hereby sign the CLA
   ```
 
-  The CLA-Assistant bot will turn the PR status green once all authors have signed.
+  すべての著者が署名すると、CLA-Assistantボットが緑色のPRステータスにします。
 
 ```bash
-# Watch mode (tests rerun on change)
+# ウォッチモード（変更時にテストが再実行）
 pnpm test:watch
 
-# Type-check without emitting files
+# ファイルを出力せずに型チェック
 pnpm typecheck
 
-# Automatically fix lint + prettier issues
+# lint + prettierの問題を自動修正
 pnpm lint:fix
 pnpm format:fix
 ```
 
-### Debugging
+### デバッグ
 
-To debug the CLI with a visual debugger, do the following in the `codex-cli` folder:
+ビジュアルデバッガーでCLIをデバッグするには、`codex-cli`フォルダで以下を実行してください：
 
-- Run `pnpm run build` to build the CLI, which will generate `cli.js.map` alongside `cli.js` in the `dist` folder.
-- Run the CLI with `node --inspect-brk ./dist/cli.js` The program then waits until a debugger is attached before proceeding. Options:
-  - In VS Code, choose **Debug: Attach to Node Process** from the command palette and choose the option in the dropdown with debug port `9229` (likely the first option)
-  - Go to <chrome://inspect> in Chrome and find **localhost:9229** and click **trace**
+- `pnpm run build`を実行してCLIをビルドします。これにより、`dist`フォルダの`cli.js`と並んで`cli.js.map`が生成されます。
+- `node --inspect-brk ./dist/cli.js`でCLIを実行します。プログラムはデバッガーがアタッチされるまで待機してから続行します。オプション：
+  - VS Codeで、コマンドパレットから**Debug: Attach to Node Process**を選択し、デバッグポート`9229`を持つオプション（おそらく最初のオプション）をドロップダウンで選択
+  - Chromeで<chrome://inspect>に移動し、**localhost:9229**を見つけて**trace**をクリック
 
-### Writing high-impact code changes
+### 高インパクトなコード変更の作成
 
-1. **Start with an issue.** Open a new one or comment on an existing discussion so we can agree on the solution before code is written.
-2. **Add or update tests.** Every new feature or bug-fix should come with test coverage that fails before your change and passes afterwards. 100% coverage is not required, but aim for meaningful assertions.
-3. **Document behaviour.** If your change affects user-facing behaviour, update the README, inline help (`codex --help`), or relevant example projects.
-4. **Keep commits atomic.** Each commit should compile and the tests should pass. This makes reviews and potential rollbacks easier.
+1. **課題から始める。** 新しい課題を開くか、既存の議論にコメントして、コードが書かれる前に解決策に合意できるようにします。
+2. **テストを追加または更新する。** すべての新機能やバグ修正には、変更前に失敗し、変更後に成功するテストカバレッジが必要です。100%のカバレッジは必要ありませんが、意味のあるアサーションを目指してください。
+3. **動作を文書化する。** 変更がユーザー向けの動作に影響する場合、README、インラインヘルプ（`codex --help`）、または関連する例プロジェクトを更新してください。
+4. **コミットをアトミックに保つ。** 各コミットはコンパイルされ、テストは成功する必要があります。これにより、レビューと潜在的なロールバックが容易になります。
 
-### Opening a pull request
+### プルリクエストの作成
 
-- Fill in the PR template (or include similar information) - **What? Why? How?**
-- Run **all** checks locally (`npm test && npm run lint && npm run typecheck`). CI failures that could have been caught locally slow down the process.
-- Make sure your branch is up-to-date with `main` and that you have resolved merge conflicts.
-- Mark the PR as **Ready for review** only when you believe it is in a merge-able state.
+- PRテンプレートに記入する（または同様の情報を含める） - **何を？なぜ？どのように？**
+- **すべての**チェックをローカルで実行（`npm test && npm run lint && npm run typecheck`）。ローカルで捕捉できたCI失敗はプロセスを遅くします。
+- ブランチが`main`と最新であり、マージ競合を解決していることを確認してください。
+- マージ可能な状態にあると信じる場合のみ、PRを**Ready for review**としてマークしてください。
 
-### Review process
+### レビュープロセス
 
-1. One maintainer will be assigned as a primary reviewer.
-2. We may ask for changes - please do not take this personally. We value the work, we just also value consistency and long-term maintainability.
-3. When there is consensus that the PR meets the bar, a maintainer will squash-and-merge.
+1. 1人のメンテナーが主要レビューアーとして割り当てられます。
+2. 変更を求める場合があります - 個人的に受け取らないでください。私たちは作業を評価しますが、一貫性と長期的な保守性も重視します。
+3. PRが基準を満たすというコンセンサスがある場合、メンテナーがスカッシュアンドマージします。
 
-### Community values
+### コミュニティの価値観
 
-- **Be kind and inclusive.** Treat others with respect; we follow the [Contributor Covenant](https://www.contributor-covenant.org/).
-- **Assume good intent.** Written communication is hard - err on the side of generosity.
-- **Teach & learn.** If you spot something confusing, open an issue or PR with improvements.
+- **親切で包括的であること。** 他者を尊重して扱う；私たちは[Contributor Covenant](https://www.contributor-covenant.org/)に従います。
+- **良い意図を仮定する。** 書面でのコミュニケーションは困難です - 寛大さの側に立ってください。
+- **教える＆学ぶ。** 混乱するものを見つけた場合、改善とともに課題やPRを開いてください。
 
-### Getting help
+### ヘルプの取得
 
-If you run into problems setting up the project, would like feedback on an idea, or just want to say _hi_ - please open a Discussion or jump into the relevant issue. We are happy to help.
+プロジェクトの設定で問題が発生した場合、アイデアについてフィードバックが欲しい場合、または単に*こんにちは*と言いたい場合 - Discussionを開くか、関連する課題に参加してください。喜んでお手伝いします。
 
-Together we can make Codex CLI an incredible tool. **Happy hacking!** :rocket:
+一緒にCodex CLIを素晴らしいツールにできます。**ハッピーハッキング！** :rocket:
 
-### Contributor license agreement (CLA)
+### 貢献者ライセンス契約（CLA）
 
-All contributors **must** accept the CLA. The process is lightweight:
+すべての貢献者はCLAを受け入れる**必要があります**。プロセスは軽量です：
 
-1. Open your pull request.
-2. Paste the following comment (or reply `recheck` if you've signed before):
+1. プルリクエストを開く。
+2. 以下のコメントを貼り付ける（または以前に署名した場合は`recheck`と返信）：
 
    ```text
    I have read the CLA Document and I hereby sign the CLA
    ```
 
-3. The CLA-Assistant bot records your signature in the repo and marks the status check as passed.
+3. CLA-Assistantボットがリポジトリに署名を記録し、ステータスチェックを合格としてマークします。
 
-No special Git commands, email attachments, or commit footers required.
+特別なGitコマンド、メール添付ファイル、またはコミットフッターは不要です。
 
-#### Quick fixes
+#### クイックフィックス
 
-| Scenario          | Command                                          |
-| ----------------- | ------------------------------------------------ |
-| Amend last commit | `git commit --amend -s --no-edit && git push -f` |
+| シナリオ             | コマンド                                         |
+| -------------------- | ------------------------------------------------ |
+| 最後のコミットを修正 | `git commit --amend -s --no-edit && git push -f` |
 
-The **DCO check** blocks merges until every commit in the PR carries the footer (with squash this is just the one).
+**DCOチェック**は、PRのすべてのコミットがフッターを持つまでマージをブロックします（スカッシュでは1つだけ）。
 
-### Releasing `codex`
+### Codexのリリース
 
-To publish a new version of the CLI you first need to stage the npm package. A
-helper script in `codex-cli/scripts/` does all the heavy lifting. Inside the
-`codex-cli` folder run:
+CLIの新しいバージョンを公開するには、まずnpmパッケージをステージングする必要があります。`codex-cli/scripts/`のヘルパースクリプトがすべての重い作業を行います。`codex-cli`フォルダ内で実行：
 
 ```bash
-# Classic, JS implementation that includes small, native binaries for Linux sandboxing.
+# Linux サンドボックス用の小さなネイティブバイナリを含むクラシックなJS実装。
 pnpm stage-release
 
-# Optionally specify the temp directory to reuse between runs.
+# オプションで実行間で再利用するため一時ディレクトリを指定。
 RELEASE_DIR=$(mktemp -d)
 pnpm stage-release --tmp "$RELEASE_DIR"
 
-# "Fat" package that additionally bundles the native Rust CLI binaries for
-# Linux. End-users can then opt-in at runtime by setting CODEX_RUST=1.
+# さらにLinux用のネイティブRust CLIバイナリをバンドルする「Fat」パッケージ。
+# エンドユーザーはCODEX_RUST=1を設定することで実行時にオプトインできます。
 pnpm stage-release --native
 ```
 
-Go to the folder where the release is staged and verify that it works as intended. If so, run the following from the temp folder:
+リリースがステージングされているフォルダに移動し、意図通りに動作することを確認してください。その場合、一時フォルダから以下を実行：
 
 ```
 cd "$RELEASE_DIR"
 npm publish
 ```
 
-### Alternative build options
+### 代替ビルドオプション
 
-#### Nix flake development
+#### Nix flake開発
 
-Prerequisite: Nix >= 2.4 with flakes enabled (`experimental-features = nix-command flakes` in `~/.config/nix/nix.conf`).
+前提条件：Nix >= 2.4でflakesが有効（`~/.config/nix/nix.conf`で`experimental-features = nix-command flakes`）。
 
-Enter a Nix development shell:
+Nix開発シェルに入る：
 
 ```bash
-# Use either one of the commands according to which implementation you want to work with
-nix develop .#codex-cli # For entering codex-cli specific shell
-nix develop .#codex-rs # For entering codex-rs specific shell
+# 作業したい実装に応じてコマンドのいずれかを使用
+nix develop .#codex-cli # codex-cli固有のシェルに入る場合
+nix develop .#codex-rs # codex-rs固有のシェルに入る場合
 ```
 
-This shell includes Node.js, installs dependencies, builds the CLI, and provides a `codex` command alias.
+このシェルには、Node.js、依存関係のインストール、CLIのビルド、`codex`コマンドのエイリアスが含まれています。
 
-Build and run the CLI directly:
+CLIを直接ビルドして実行：
 
 ```bash
-# Use either one of the commands according to which implementation you want to work with
-nix build .#codex-cli # For building codex-cli
-nix build .#codex-rs # For building codex-rs
+# 作業したい実装に応じてコマンドのいずれかを使用
+nix build .#codex-cli # codex-cliをビルドする場合
+nix build .#codex-rs # codex-rsをビルドする場合
 ./result/bin/codex --help
 ```
 
-Run the CLI via the flake app:
+flakeアプリ経由でCLIを実行：
 
 ```bash
-# Use either one of the commands according to which implementation you want to work with
-nix run .#codex-cli # For running codex-cli
-nix run .#codex-rs # For running codex-rs
+# 作業したい実装に応じてコマンドのいずれかを使用
+nix run .#codex-cli # codex-cliを実行する場合
+nix run .#codex-rs # codex-rsを実行する場合
 ```
 
-Use direnv with flakes
+flakesでdirenvを使用
 
-If you have direnv installed, you can use the following `.envrc` to automatically enter the Nix shell when you `cd` into the project directory:
+direnvがインストールされている場合、以下の`.envrc`を使用してプロジェクトディレクトリに`cd`すると自動的にNixシェルに入ることができます：
 
 ```bash
 cd codex-rs
@@ -722,12 +793,12 @@ echo "use flake ../flake.nix#codex-rs" >> .envrc && direnv allow
 
 ---
 
-## Security & responsible AI
+## セキュリティと責任あるAI
 
-Have you discovered a vulnerability or have concerns about model output? Please e-mail **security@openai.com** and we will respond promptly.
+脆弱性を発見したり、モデル出力について懸念がありますか？**security@openai.com**にメールをお送りください。迅速に対応いたします。
 
 ---
 
-## License
+## ライセンス
 
-This repository is licensed under the [Apache-2.0 License](LICENSE).
+このリポジトリは[Apache-2.0 License](LICENSE)の下でライセンスされています。
