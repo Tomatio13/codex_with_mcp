@@ -111,27 +111,27 @@ async function generateCommandExplanation(
 
     // Extract the explanation from the response
     const explanation =
-      response.choices[0]?.message.content || "Unable to generate explanation.";
+      response.choices[0]?.message.content || "説明を生成できませんでした。";
     return explanation;
   } catch (error) {
     log(`Error generating command explanation: ${error}`);
 
-    let errorMessage = "Unable to generate explanation due to an error.";
+    let errorMessage = "エラーにより説明を生成できませんでした。";
     if (error instanceof Error) {
-      errorMessage = `Unable to generate explanation: ${error.message}`;
+      errorMessage = `説明を生成できません: ${error.message}`;
 
       // If it's an API error, check for more specific information
       if ("status" in error && typeof error.status === "number") {
         // Handle API-specific errors
         if (error.status === 401) {
           errorMessage =
-            "Unable to generate explanation: API key is invalid or expired.";
+            "説明を生成できません: APIキーが無効または期限切れです。";
         } else if (error.status === 429) {
           errorMessage =
-            "Unable to generate explanation: Rate limit exceeded. Please try again later.";
+            "説明を生成できません: レート制限を超過しました。しばらくしてから再試行してください。";
         } else if (error.status >= 500) {
           errorMessage =
-            "Unable to generate explanation: OpenAI service is currently unavailable. Please try again later.";
+            "説明を生成できません: OpenAIサービスが現在利用できません。しばらくしてから再試行してください。";
         }
       }
     }
@@ -188,7 +188,7 @@ export default function TerminalChat({
           type: "message",
           role: "system",
           content: [
-            { type: "input_text", text: `Failed to compact context: ${err}` },
+            { type: "input_text", text: `コンテキストの圧縮に失敗しました: ${err}` },
           ],
         } as ResponseItem,
       ]);
@@ -536,7 +536,7 @@ export default function TerminalChat({
           />
         ) : (
           <Box>
-            <Text color="gray">Initializing agent…</Text>
+            <Text color="gray">エージェントを初期化中…</Text>
           </Box>
         )}
         {overlayMode === "none" && agent && (
@@ -569,7 +569,7 @@ export default function TerminalChat({
               if (isGitRepo) {
                 text = diff;
               } else {
-                text = "`/diff` — _not inside a git repository_";
+                text = "`/diff` — _gitリポジトリ内ではありません_";
               }
               setItems((prev) => [
                 ...prev,
@@ -605,7 +605,7 @@ export default function TerminalChat({
                   content: [
                     {
                       type: "input_text",
-                      text: "⏹️  Execution interrupted by user. You can continue typing.",
+                      text: "⏹️  ユーザーにより実行が中断されました。入力を続けることができます。",
                     },
                   ],
                 },
@@ -692,7 +692,7 @@ export default function TerminalChat({
                   content: [
                     {
                       type: "input_text",
-                      text: `Switched model to ${newModel}`,
+                      text: `モデルを${newModel}に切り替えました`,
                     },
                   ],
                 },
@@ -736,7 +736,7 @@ export default function TerminalChat({
                   content: [
                     {
                       type: "input_text",
-                      text: `Switched provider to ${newProvider} with model ${defaultModel}`,
+                      text: `プロバイダーを${newProvider}に、モデルを${defaultModel}に切り替えました`,
                     },
                   ],
                 },
@@ -775,7 +775,7 @@ export default function TerminalChat({
                   content: [
                     {
                       type: "input_text",
-                      text: `Switched approval mode to ${newMode}`,
+                      text: `承認モードを${newMode}に切り替えました`,
                     },
                   ],
                 },

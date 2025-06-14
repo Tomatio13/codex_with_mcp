@@ -34,7 +34,7 @@ export function TerminalChatToolCallCommand({
   return (
     <>
       <Text bold color="green">
-        Shell Command
+シェルコマンド
       </Text>
       <Text>
         <Text dimColor>$</Text> {colorizedCommand}
@@ -42,7 +42,7 @@ export function TerminalChatToolCallCommand({
       {explanation && (
         <>
           <Text bold color="yellow">
-            Explanation
+説明
           </Text>
           {explanation.split("\n").map((line, i) => {
             // Apply different styling to headings (numbered items)
@@ -104,10 +104,10 @@ export function TerminalChatToolCallApplyPatch({
     return (
       <>
         <Text bold color="red">
-          Invalid Patch
+無効なパッチ
         </Text>
         <Text color="red" dimColor>
-          The provided patch command is invalid.
+提供されたパッチコマンドが無効です。
         </Text>
         <Text dimColor>{commandForDisplay}</Text>
       </>
@@ -118,10 +118,10 @@ export function TerminalChatToolCallApplyPatch({
     return (
       <>
         <Text bold color="yellow">
-          Empty Patch
+空のパッチ
         </Text>
         <Text color="yellow" dimColor>
-          No operations found in the patch command.
+パッチコマンドに操作が見つかりません。
         </Text>
         <Text dimColor>{commandForDisplay}</Text>
       </>

@@ -8,33 +8,33 @@ export interface SlashCommand {
 export const SLASH_COMMANDS: Array<SlashCommand> = [
   {
     command: "/clear",
-    description: "Clear conversation history and free up context",
+    description: "会話履歴をクリアしてコンテキストを解放",
   },
   {
     command: "/clearhistory",
-    description: "Clear command history",
+    description: "コマンド履歴をクリア",
   },
   {
     command: "/compact",
     description:
-      "Clear conversation history but keep a summary in context. Optional: /compact [instructions for summarization]",
+      "会話履歴をクリアしつつ要約をコンテキストに保持。オプション: /compact [要約の指示]",
   },
-  { command: "/history", description: "Open command history" },
-  { command: "/sessions", description: "Browse previous sessions" },
-  { command: "/help", description: "Show list of commands" },
-  { command: "/model", description: "Open model selection panel" },
-  { command: "/approval", description: "Open approval mode selection panel" },
+  { command: "/history", description: "コマンド履歴を開く" },
+  { command: "/sessions", description: "過去のセッションを参照" },
+  { command: "/help", description: "コマンド一覧を表示" },
+  { command: "/model", description: "モデル選択パネルを開く" },
+  { command: "/approval", description: "承認モード選択パネルを開く" },
   {
     command: "/bug",
-    description: "Generate a prefilled GitHub issue URL with session log",
+    description: "セッションログ付きのGitHub issue URLを生成",
   },
   {
     command: "/diff",
     description:
-      "Show git diff of the working directory (or applied patches if not in git)",
+      "ワーキングディレクトリのgit diffを表示（gitでない場合は適用されたパッチ）",
   },
   {
     command: "/mcp",
-    description: "List MCP servers",
+    description: "MCPサーバーを一覧表示",
   },
 ];

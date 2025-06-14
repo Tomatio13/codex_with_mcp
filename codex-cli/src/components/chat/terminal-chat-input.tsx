@@ -36,9 +36,9 @@ import React, {
 import { useInterval } from "use-interval";
 
 const suggestions = [
-  "explain this codebase to me",
-  "fix any build errors",
-  "are there any bugs in my code?",
+  "このコードベースを説明してください",
+  "ビルドエラーを修正してください",
+  "コードにバグはありますか？",
 ];
 
 type Props = {
@@ -563,7 +563,7 @@ export default function TerminalChatInput({
               id: `clear-${Date.now()}`,
               type: "message",
               role: "system",
-              content: [{ type: "input_text", text: "Terminal cleared" }],
+              content: [{ type: "input_text", text: "ターミナルがクリアされました" }],
             },
           ];
         });
@@ -587,7 +587,7 @@ export default function TerminalChatInput({
                 type: "message",
                 role: "system",
                 content: [
-                  { type: "input_text", text: "Command history cleared" },
+                  { type: "input_text", text: "コマンド履歴がクリアされました" },
                 ],
               },
             ]);
@@ -624,7 +624,7 @@ export default function TerminalChatInput({
               content: [
                 {
                   type: "input_text",
-                  text: `🔗 Bug report URL: ${url}`,
+                  text: `🔗 バグレポートURL: ${url}`,
                 },
               ],
             },
@@ -640,7 +640,7 @@ export default function TerminalChatInput({
               content: [
                 {
                   type: "input_text",
-                  text: `⚠️ Failed to create bug report URL: ${error}`,
+                  text: `⚠️ バグレポートURLの作成に失敗しました: ${error}`,
                 },
               ],
             },
@@ -666,7 +666,7 @@ export default function TerminalChatInput({
               content: [
                 {
                   type: "input_text",
-                  text: `Invalid command "${trimmed}". Use /help to retrieve the list of commands.`,
+                  text: `無効なコマンド"${trimmed}"。/helpでコマンド一覧を表示してください。`,
                 },
               ],
             },
@@ -766,8 +766,7 @@ export default function TerminalChatInput({
       return (
         <Text>
           <Text color="red">
-            {Math.round(contextLeftPercent)}% context left — send "/compact" to
-            condense context
+コンテキスト残量 {Math.round(contextLeftPercent)}% — "/compact"でコンテキストを圧縮
           </Text>
         </Text>
       );
@@ -778,7 +777,7 @@ export default function TerminalChatInput({
     return (
       <Text>
         <Text color={contextColor}>
-          {Math.round(contextLeftPercent)}% context left
+コンテキスト残量 {Math.round(contextLeftPercent)}%
         </Text>
       </Text>
     );
@@ -871,7 +870,7 @@ export default function TerminalChatInput({
       <Box paddingX={2} marginBottom={1}>
         {isNew && !input ? (
           <Text dimColor>
-            try:{" "}
+試してみましょう:{" "}
             {suggestions.map((m, key) => (
               <Fragment key={key}>
                 {key !== 0 ? " | " : ""}
@@ -893,7 +892,7 @@ export default function TerminalChatInput({
           />
         ) : (
           <Text dimColor>
-            ctrl+c to exit | "/" to see commands | enter to send
+ctrl+cで終了 | "/"でコマンド表示 | enterで送信
             {" — "}
             {contextInfo}
           </Text>

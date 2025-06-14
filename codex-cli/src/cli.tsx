@@ -7,9 +7,9 @@ if (major < 22) {
   // eslint-disable-next-line no-console
   console.error(
     "\n" +
-      "Codex CLI requires Node.js version 22 or newer.\n" +
-      `You are running Node.js v${process.versions.node}.\n` +
-      "Please upgrade Node.js: https://nodejs.org/en/download/\n",
+      "Codex CLIはNode.jsバージョン22以降が必要です。\n" +
+      `現在のNode.jsバージョン: v${process.versions.node}\n` +
+      "Node.jsをアップグレードしてください: https://nodejs.org/en/download/\n",
   );
   process.exit(1);
 }
@@ -247,7 +247,7 @@ complete -c codex -a '(__fish_complete_path)' -d 'file path'`,
   const script = scripts[shell];
   if (!script) {
     // eslint-disable-next-line no-console
-    console.error(`Unsupported shell: ${shell}`);
+    console.error(`サポートされていないシェル: ${shell}`);
     process.exit(1);
   }
   // eslint-disable-next-line no-console
@@ -426,8 +426,8 @@ if (config.flexMode) {
     if (cli.flags.flexMode) {
       // eslint-disable-next-line no-console
       console.error(
-        `The --flex-mode option is only supported when using the 'o3' or 'o4-mini' models. ` +
-          `Current model: '${config.model}'.`,
+        `--flex-modeオプションは'o3'または'o4-mini'モデル使用時のみサポートされます。` +
+          `現在のモデル: '${config.model}'。`,
       );
       process.exit(1);
     } else {
@@ -442,10 +442,10 @@ if (
 ) {
   // eslint-disable-next-line no-console
   console.error(
-    `The model "${config.model}" does not appear in the list of models ` +
-      `available to your account. Double-check the spelling (use\n` +
+    `モデル"${config.model}"はあなたのアカウントで利用可能なモデル一覧にありません。` +
+      `スペルを確認するか（\n` +
       `  openai models list\n` +
-      `to see the full list) or choose another model with the --model flag.`,
+      `で一覧を表示）、--modelフラグで別のモデルを選択してください。`,
   );
   process.exit(1);
 }
@@ -484,7 +484,7 @@ if (cli.flags.history) {
       rollout = JSON.parse(content) as AppRollout;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error("Error reading session file:", error);
+      console.error("セッションファイルの読み込みエラー:", error);
       process.exit(1);
     }
   } else {
@@ -503,7 +503,7 @@ if (cli.flags.view) {
     rollout = JSON.parse(content) as AppRollout;
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error("Error reading rollout file:", error);
+    console.error("ロールアウトファイルの読み込みエラー:", error);
     process.exit(1);
   }
 }
@@ -530,7 +530,7 @@ if (cli.flags.quiet) {
   if (!prompt || prompt.trim() === "") {
     // eslint-disable-next-line no-console
     console.error(
-      'Quiet mode requires a prompt string, e.g.,: codex -q "Fix bug #123 in the foobar project"',
+      '静音モードはプロンプト文字列が必要です。例: codex -q "foobarプロジェクトのバグ#123を修正"',
     );
     process.exit(1);
   }

@@ -49,7 +49,7 @@ const TerminalHeader: React.FC<TerminalHeaderProps> = ({
   // Generate MCP status text
   const mcpStatusText = () => {
     if (!mcpStats) {
-      return "● not initialized";
+      return "● 初期化されていません";
     }
 
     const {
@@ -63,11 +63,11 @@ const TerminalHeader: React.FC<TerminalHeaderProps> = ({
     if (status === "connected") {
       return `● ${connectedServers}/${totalServers} servers, ${toolsCount} tools`;
     } else if (status === "connecting") {
-      return `● connecting...`;
+      return `● 接続中...`;
     } else if (status === "error") {
       return `● ${erroredServers}/${totalServers} errors`;
     } else {
-      return "● not connected";
+      return "● 接続されていません";
     }
   };
 

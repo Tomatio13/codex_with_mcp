@@ -110,18 +110,17 @@ export default function TerminalChatInputThinking({
         <Box gap={2}>
           <Text>{frameWithSeconds}</Text>
           <Text>
-            Thinking
+思考中
             {dots}
           </Text>
         </Box>
         <Text>
-          Press <Text bold>Esc</Text> twice to interrupt
+<Text bold>Esc</Text>を2回押して中断
         </Text>
       </Box>
       {awaitingConfirm && (
         <Text dimColor>
-          Press <Text bold>Esc</Text> again to interrupt and enter a new
-          instruction
+<Text bold>Esc</Text>を再度押して中断し、新しい指示を入力
         </Text>
       )}
     </Box>

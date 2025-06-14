@@ -45,11 +45,9 @@ export default function TerminalChatResponseItem({
           fileOpener={fileOpener}
         />
       );
-    // @ts-expect-error new item types aren't in SDK yet
     case "local_shell_call":
     case "function_call":
       return <TerminalChatResponseToolCall message={item} />;
-    // @ts-expect-error new item types aren't in SDK yet
     case "local_shell_call_output":
     case "function_call_output":
       return (

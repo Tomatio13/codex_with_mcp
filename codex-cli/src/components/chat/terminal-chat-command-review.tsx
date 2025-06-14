@@ -10,7 +10,7 @@ import React from "react";
 
 // default deny‑reason:
 const DEFAULT_DENY_MESSAGE =
-  "Don't do that, but keep trying to fix the problem";
+  "それは実行しないでください、しかし問題の解決を続けてください";
 
 export function TerminalChatCommandReview({
   confirmationPrompt,
@@ -80,38 +80,38 @@ export function TerminalChatCommandReview({
       | { label: string; value: "switch" }
     > = [
       {
-        label: "Yes (y)",
+        label: "はい (y)",
         value: ReviewDecision.YES,
       },
     ];
 
     if (showAlwaysApprove) {
       opts.push({
-        label: "Yes, always approve this exact command for this session (a)",
+        label: "はい、このセッション中はこのコマンドを常に承認します (a)",
         value: ReviewDecision.ALWAYS,
       });
     }
 
     opts.push(
       {
-        label: "Explain this command (x)",
+        label: "このコマンドを説明します (x)",
         value: ReviewDecision.EXPLAIN,
       },
       {
-        label: "Edit or give feedback (e)",
+        label: "編集またはフィードバックを与える (e)",
         value: "edit",
       },
       // allow switching approval mode
       {
-        label: "Switch approval mode (s)",
+        label: "承認モードを切り替える (s)",
         value: "switch",
       },
       {
-        label: "No, and keep going (n)",
+        label: "いいえ、続行します (n)",
         value: ReviewDecision.NO_CONTINUE,
       },
       {
-        label: "No, and stop for now (esc)",
+        label: "いいえ、一旦停止します (esc)",
         value: ReviewDecision.NO_EXIT,
       },
     );
@@ -131,7 +131,7 @@ export function TerminalChatCommandReview({
         } else if (input === "n") {
           onReviewCommand(
             ReviewDecision.NO_CONTINUE,
-            "Don't do that, keep going though",
+            "それは実行しないでください、しかし続行しましょう",
           );
         } else if (input === "a" && showAlwaysApprove) {
           onReviewCommand(ReviewDecision.ALWAYS);
@@ -171,7 +171,7 @@ export function TerminalChatCommandReview({
         {mode === "explanation" ? (
           <>
             <Text bold color="yellow">
-              Command Explanation:
+              コマンドの説明:
             </Text>
             <Box paddingX={2} flexDirection="column" gap={1}>
               {explanation ? (
@@ -200,14 +200,14 @@ export function TerminalChatCommandReview({
                   })}
                 </>
               ) : (
-                <Text dimColor>Loading explanation...</Text>
+                <Text dimColor>説明を読み込み中...</Text>
               )}
-              <Text dimColor>Press any key to return to options</Text>
+              <Text dimColor>任意のキーを押してオプションに戻る</Text>
             </Box>
           </>
         ) : mode === "select" ? (
           <>
-            <Text>Allow command?</Text>
+            <Text>コマンドを実行しますか？</Text>
             <Box paddingX={2} flexDirection="column" gap={1}>
               <Select
                 isDisabled={!isActive}
@@ -227,13 +227,13 @@ export function TerminalChatCommandReview({
           </>
         ) : mode === "input" ? (
           <>
-            <Text>Give the model feedback (↵ to submit):</Text>
+            <Text>モデルにフィードバックを与える (↵で送信):</Text>
             <Box borderStyle="round">
               <Box paddingX={1}>
                 <TextInput
                   value={msg}
                   onChange={setMsg}
-                  placeholder="type a reason"
+                  placeholder="理由を入力してください"
                   showCursor
                   focus
                 />
@@ -243,7 +243,7 @@ export function TerminalChatCommandReview({
             {msg.trim() === "" && (
               <Box paddingX={2} marginBottom={1}>
                 <Text dimColor>
-                  default:&nbsp;
+                  デフォルト:&nbsp;
                   <Text>{DEFAULT_DENY_MESSAGE}</Text>
                 </Text>
               </Box>
