@@ -52,4 +52,9 @@ export const providers: Record<
     baseURL: "https://conductor.arcee.ai/v1",
     envKey: "ARCEEAI_API_KEY",
   },
+  litelllm: {
+    name: "LiteLLM",
+    baseURL: "https://litellm/v1",
+    envKey: "LITELLM_API_KEY",
+  },
 };
