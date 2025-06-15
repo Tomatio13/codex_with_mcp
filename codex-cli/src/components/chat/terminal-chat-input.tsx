@@ -12,12 +12,22 @@ import MultilineTextEditor from "./multiline-editor";
 import { TerminalChatCommandReview } from "./terminal-chat-command-review.js";
 import TextCompletions from "./terminal-chat-completions.js";
 import { loadConfig } from "../../utils/config.js";
+import {
+  isCustomCommand,
+  parseCustomCommand,
+  findCustomCommand,
+  substituteArguments,
+} from "../../utils/custom-commands";
 import { getFileSystemSuggestions } from "../../utils/file-system-suggestions.js";
 import { expandFileTags } from "../../utils/file-tag-utils";
 import { createInputItem } from "../../utils/input-utils.js";
 import { log } from "../../utils/logger/log.js";
 import { setSessionId } from "../../utils/session.js";
-import { SLASH_COMMANDS, type SlashCommand } from "../../utils/slash-commands";
+import {
+  SLASH_COMMANDS,
+  type SlashCommand,
+  getAllSlashCommands,
+} from "../../utils/slash-commands";
 import {
   loadCommandHistory,
   addToHistory,
@@ -94,6 +104,9 @@ export default function TerminalChatInput({
   // Slash command suggestion index
   const [selectedSlashSuggestion, setSelectedSlashSuggestion] =
     useState<number>(0);
+  // Available slash commands (including custom commands)
+  const [allSlashCommands, setAllSlashCommands] =
+    useState<Array<SlashCommand>>(SLASH_COMMANDS);
   const app = useApp();
   const [selectedSuggestion, setSelectedSuggestion] = useState<number>(0);
   const [input, setInput] = useState("");
@@ -224,6 +237,16 @@ export default function TerminalChatInput({
 
     loadHistory();
   }, []);
+
+  // Load all slash commands (including custom commands) on component mount
+  useEffect(() => {
+    async function loadAllCommands() {
+      const commands = await getAllSlashCommands();
+      setAllSlashCommands(commands);
+    }
+
+    loadAllCommands();
+  }, []);
   // Reset slash suggestion index when input prefix changes
   useEffect(() => {
     if (input.trim().startsWith("/")) {
@@ -236,7 +259,7 @@ export default function TerminalChatInput({
       // Slash command navigation: up/down to select, enter to fill
       if (!confirmationPrompt && !loading && input.trim().startsWith("/")) {
         const prefix = input.trim();
-        const matches = SLASH_COMMANDS.filter((cmd: SlashCommand) =>
+        const matches = allSlashCommands.filter((cmd: SlashCommand) =>
           cmd.command.startsWith(prefix),
         );
         if (matches.length > 0) {
@@ -318,6 +341,10 @@ export default function TerminalChatInput({
                   openMcpOverlay();
                   break;
                 default:
+                  // Handle custom commands
+                  if (isCustomCommand(cmd)) {
+                    onSubmit(cmd);
+                  }
                   break;
               }
             }
@@ -563,7 +590,9 @@ export default function TerminalChatInput({
               id: `clear-${Date.now()}`,
               type: "message",
               role: "system",
-              content: [{ type: "input_text", text: "ターミナルがクリアされました" }],
+              content: [
+                { type: "input_text", text: "ターミナルがクリアされました" },
+              ],
             },
           ];
         });
@@ -587,7 +616,10 @@ export default function TerminalChatInput({
                 type: "message",
                 role: "system",
                 content: [
-                  { type: "input_text", text: "コマンド履歴がクリアされました" },
+                  {
+                    type: "input_text",
+                    text: "コマンド履歴がクリアされました",
+                  },
                 ],
               },
             ]);
@@ -641,6 +673,72 @@ export default function TerminalChatInput({
                 {
                   type: "input_text",
                   text: `⚠️ バグレポートURLの作成に失敗しました: ${error}`,
+                },
+              ],
+            },
+          ]);
+        }
+
+        return;
+      } else if (isCustomCommand(inputValue)) {
+        // Handle custom commands
+        setInput("");
+
+        try {
+          const { command, args } = parseCustomCommand(inputValue);
+          const customCommand = await findCustomCommand(command);
+
+          if (customCommand) {
+            const processedContent = customCommand.hasArguments
+              ? substituteArguments(customCommand.content, args)
+              : customCommand.content;
+
+            // Submit the processed custom command content as a user message
+            submitInput([
+              {
+                role: "user",
+                content: [{ type: "input_text", text: processedContent }],
+                type: "message",
+              },
+            ]);
+
+            // Add to history
+            const config = loadConfig();
+            const newHistory = await addToHistory(inputValue, history, {
+              maxSize: config.history?.maxSize ?? 1000,
+              saveHistory: config.history?.saveHistory ?? true,
+              sensitivePatterns: config.history?.sensitivePatterns ?? [],
+            });
+            setHistory(newHistory);
+          } else {
+            // Custom command not found
+            setItems((prev) => [
+              ...prev,
+              {
+                id: `customcommand-notfound-${Date.now()}`,
+                type: "message",
+                role: "system",
+                content: [
+                  {
+                    type: "input_text",
+                    text: `カスタムコマンド"${command}"が見つかりません。`,
+                  },
+                ],
+              },
+            ]);
+          }
+        } catch (error) {
+          // Error processing custom command
+          setItems((prev) => [
+            ...prev,
+            {
+              id: `customcommand-error-${Date.now()}`,
+              type: "message",
+              role: "system",
+              content: [
+                {
+                  type: "input_text",
+                  text: `カスタムコマンドの処理中にエラーが発生しました: ${error}`,
                 },
               ],
             },
@@ -766,7 +864,8 @@ export default function TerminalChatInput({
       return (
         <Text>
           <Text color="red">
-コンテキスト残量 {Math.round(contextLeftPercent)}% — "/compact"でコンテキストを圧縮
+            コンテキスト残量 {Math.round(contextLeftPercent)}% —
+            "/compact"でコンテキストを圧縮
           </Text>
         </Text>
       );
@@ -777,7 +876,7 @@ export default function TerminalChatInput({
     return (
       <Text>
         <Text color={contextColor}>
-コンテキスト残量 {Math.round(contextLeftPercent)}%
+          コンテキスト残量 {Math.round(contextLeftPercent)}%
         </Text>
       </Text>
     );
@@ -851,26 +950,26 @@ export default function TerminalChatInput({
       {/* Slash command autocomplete suggestions */}
       {input.trim().startsWith("/") && (
         <Box flexDirection="column" paddingX={2} marginBottom={1}>
-          {SLASH_COMMANDS.filter((cmd: SlashCommand) =>
-            cmd.command.startsWith(input.trim()),
-          ).map((cmd: SlashCommand, idx: number) => (
-            <Box key={cmd.command}>
-              <Text
-                backgroundColor={
-                  idx === selectedSlashSuggestion ? "blackBright" : undefined
-                }
-              >
-                <Text color="blueBright">{cmd.command}</Text>
-                <Text> {cmd.description}</Text>
-              </Text>
-            </Box>
-          ))}
+          {allSlashCommands
+            .filter((cmd: SlashCommand) => cmd.command.startsWith(input.trim()))
+            .map((cmd: SlashCommand, idx: number) => (
+              <Box key={cmd.command}>
+                <Text
+                  backgroundColor={
+                    idx === selectedSlashSuggestion ? "blackBright" : undefined
+                  }
+                >
+                  <Text color="blueBright">{cmd.command}</Text>
+                  <Text> {cmd.description}</Text>
+                </Text>
+              </Box>
+            ))}
         </Box>
       )}
       <Box paddingX={2} marginBottom={1}>
         {isNew && !input ? (
           <Text dimColor>
-試してみましょう:{" "}
+            試してみましょう:{" "}
             {suggestions.map((m, key) => (
               <Fragment key={key}>
                 {key !== 0 ? " | " : ""}
@@ -892,7 +991,7 @@ export default function TerminalChatInput({
           />
         ) : (
           <Text dimColor>
-ctrl+cで終了 | "/"でコマンド表示 | enterで送信
+            ctrl+cで終了 | "/"でコマンド表示 | enterで送信
             {" — "}
             {contextInfo}
           </Text>

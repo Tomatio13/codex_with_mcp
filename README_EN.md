@@ -15,15 +15,20 @@
 - [Experimental technology disclaimer](#experimental-technology-disclaimer)
 - [Quickstart](#quickstart)
 - [Why Codex?](#why-codex)
-- [Security model & permissions](#security-model--permissions)
+- [Security model \& permissions](#security-model--permissions)
   - [Platform sandboxing details](#platform-sandboxing-details)
 - [System requirements](#system-requirements)
 - [CLI reference](#cli-reference)
-- [Memory & project docs](#memory--project-docs)
+- [Memory \& project docs](#memory--project-docs)
 - [Non-interactive / CI mode](#non-interactive--ci-mode)
 - [Tracing / verbose logging](#tracing--verbose-logging)
 - [Recipes](#recipes)
 - [Installation](#installation)
+- [MCP (Model Control Protocol) Integration](#mcp-model-control-protocol-integration)
+  - [What is MCP?](#what-is-mcp)
+  - [MCP Server Configuration](#mcp-server-configuration)
+  - [Available MCP Servers](#available-mcp-servers)
+  - [MCP Status Monitoring](#mcp-status-monitoring)
 - [Configuration guide](#configuration-guide)
   - [Basic configuration parameters](#basic-configuration-parameters)
   - [Custom AI provider configuration](#custom-ai-provider-configuration)
@@ -32,6 +37,20 @@
   - [Full configuration example](#full-configuration-example)
   - [Custom instructions](#custom-instructions)
   - [Environment variables setup](#environment-variables-setup)
+- [Custom Commands](#custom-commands)
+  - [What are Custom Commands](#what-are-custom-commands)
+  - [Creating Custom Commands](#creating-custom-commands)
+    - [1. Create Directory](#1-create-directory)
+    - [2. Create Basic Commands](#2-create-basic-commands)
+    - [3. Create Commands with Hierarchical Structure](#3-create-commands-with-hierarchical-structure)
+  - [Usage Examples](#usage-examples)
+  - [Commands with Arguments](#commands-with-arguments)
+    - [Command Creation Example](#command-creation-example)
+    - [Usage](#usage)
+  - [Practical Custom Command Examples](#practical-custom-command-examples)
+    - [Codebase Analysis Command](#codebase-analysis-command)
+    - [Performance Optimization Command](#performance-optimization-command)
+  - [Tips and Best Practices](#tips-and-best-practices)
 - [FAQ](#faq)
 - [Zero data retention (ZDR) usage](#zero-data-retention-zdr-usage)
 - [Codex open source fund](#codex-open-source-fund)
@@ -49,7 +68,7 @@
   - [Releasing `codex`](#releasing-codex)
   - [Alternative build options](#alternative-build-options)
     - [Nix flake development](#nix-flake-development)
-- [Security & responsible AI](#security--responsible-ai)
+- [Security \& responsible AI](#security--responsible-ai)
 - [License](#license)
 
 <!-- End ToC -->
@@ -327,6 +346,91 @@ pnpm link
 
 ---
 
+## MCP (Model Control Protocol) Integration
+
+Codex CLI supports **Model Control Protocol (MCP)**, which extends the agent's capabilities by connecting to external servers that provide specialized tools and functionality.
+
+### What is MCP?
+
+MCP (Model Control Protocol) is a standardized protocol that allows Codex to connect to external servers and access their tools. This enables integration with:
+
+- **Databases** (PostgreSQL, MongoDB, etc.)
+- **APIs and Services** (GitHub, JIRA, Slack, etc.)
+- **File Systems** and storage services
+- **Memory Systems** for persistent context
+- **Custom Business Logic** and domain-specific tools
+
+### MCP Server Configuration
+
+Configure MCP servers in your `~/.codex/config.json` or `~/.codex/config.yaml` file:
+
+```json
+{
+  "mcpServers": {
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "filesystem": {
+      "command": "python",
+      "args": ["-m", "mcp_server.filesystem"],
+      "env": {
+        "ROOT_PATH": "/path/to/allowed/directory"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
+
+**Configuration Parameters:**
+
+| Parameter | Type   | Description                             | Example                                         |
+| --------- | ------ | --------------------------------------- | ----------------------------------------------- |
+| `command` | string | Executable command to start the server  | `"npx"`, `"python"`                             |
+| `args`    | array  | Command line arguments                  | `["-y", "@modelcontextprotocol/server-memory"]` |
+| `env`     | object | Environment variables for the server    | `{"API_KEY": "value"}`                          |
+| `url`     | string | Remote server URL (for SSE connections) | `"https://api.example.com/mcp"`                 |
+
+### Available MCP Servers
+
+Popular MCP servers you can integrate:
+
+- **[@modelcontextprotocol/server-memory](https://www.npmjs.com/package/@modelcontextprotocol/server-memory)** - Persistent memory and context
+- **[@modelcontextprotocol/server-filesystem](https://www.npmjs.com/package/@modelcontextprotocol/server-filesystem)** - File system operations
+- **[@modelcontextprotocol/server-github](https://www.npmjs.com/package/@modelcontextprotocol/server-github)** - GitHub integration
+- **[@modelcontextprotocol/server-postgres](https://www.npmjs.com/package/@modelcontextprotocol/server-postgres)** - PostgreSQL database access
+- **[@modelcontextprotocol/server-sqlite](https://www.npmjs.com/package/@modelcontextprotocol/server-sqlite)** - SQLite database operations
+
+For a complete list, see the [MCP Servers Directory](https://github.com/modelcontextprotocol/servers).
+
+### MCP Status Monitoring
+
+Once MCP servers are configured, Codex displays connection status:
+
+- **Connected servers** are shown with ✅
+- **Disconnected servers** are shown with ❌
+- Use `Ctrl+M` in the CLI to view detailed MCP server status
+
+**Status Display Example:**
+
+```
+MCP Server Status:
+✅ memory (3 tools available)
+✅ github (12 tools available)
+❌ database (connection failed)
+```
+
+The AI assistant will automatically use tools from connected MCP servers when relevant to your requests.
+
+---
+
 ## Configuration guide
 
 Codex configuration files can be placed in the `~/.codex/` directory, supporting both YAML and JSON formats.
@@ -476,6 +580,152 @@ export OPENROUTER_API_KEY="your-openrouter-key-here"
 
 # Similarly for other providers
 ```
+
+---
+
+## Custom Commands
+
+Codex CLI allows you to save frequently used prompts as reusable custom commands. This enables you to execute complex instructions with simple slash commands.
+
+### What are Custom Commands
+
+Custom commands are user-defined slash commands defined in Markdown files placed in the `~/.codex/command/` directory.
+
+**Key Features:**
+
+- **Reusable**: Save frequently used prompts for instant recall
+- **Arguments Support**: Insert dynamic values using `$ARGUMENTS` placeholder
+- **Hierarchical Structure**: Organize commands with directory structure
+- **Auto-completion**: Quick command selection with tab completion
+
+### Creating Custom Commands
+
+#### 1. Create Directory
+
+```bash
+mkdir -p ~/.codex/command
+```
+
+#### 2. Create Basic Commands
+
+```bash
+# Code review command
+echo "Please review this code in detail and point out improvements from the following perspectives:
+1. Performance
+2. Security
+3. Readability
+4. Best practices" > ~/.codex/command/review.md
+```
+
+#### 3. Create Commands with Hierarchical Structure
+
+```bash
+# Git commands directory
+mkdir -p ~/.codex/command/git
+
+# Commit message generation command
+echo "Generate an appropriate git commit message based on the changes.
+Please create it in the following format:
+
+\`\`\`
+<type>(<scope>): <subject>
+
+<body>
+\`\`\`
+
+- type: one of feat, fix, docs, style, refactor, test, chore
+- scope: area of impact for the change
+- subject: concise description of the change (within 50 characters)" > ~/.codex/command/git/commit-message.md
+```
+
+### Usage Examples
+
+Created custom commands can be used within Codex CLI as follows:
+
+```bash
+# Basic command usage
+/user:review
+
+# Hierarchical command usage
+/user:git:commit-message
+
+# Auto-completion
+/user:<Tab>  # Display list of available commands
+```
+
+### Commands with Arguments
+
+You can create commands that accept dynamic values using the `$ARGUMENTS` placeholder:
+
+#### Command Creation Example
+
+```bash
+# GitHub issue fix command
+echo "Please fix the issue in GitHub issue #\$ARGUMENTS. Follow these steps:
+
+1. Identify the cause of the problem
+2. Propose a fix
+3. Add test cases
+4. Update documentation (if necessary)
+
+Please explain the fix and reasoning in detail." > ~/.codex/command/fix-issue.md
+```
+
+#### Usage
+
+```bash
+# Execute command with arguments
+/user:fix-issue 123
+
+# $ARGUMENTS will be replaced with "123"
+```
+
+### Practical Custom Command Examples
+
+#### Codebase Analysis Command
+
+```markdown
+# ~/.codex/command/analyze-codebase.md
+
+Please analyze this codebase in detail and create or update a Codex.md file.
+Perform analysis from the following perspectives:
+
+## Analysis Items
+
+1. Project overview and technology stack
+2. Development workflow and commands
+3. Architecture and file structure
+4. Security and best practices
+
+Based on the analysis results, create a Codex.md file that will enable
+future Codex CLI instances to be immediately productive.
+```
+
+**Usage:** `/user:analyze-codebase`
+
+#### Performance Optimization Command
+
+```markdown
+# ~/.codex/command/optimize.md
+
+Please optimize the performance of this code. Consider the following points:
+
+1. Improve execution speed
+2. Reduce memory usage
+3. Maintain code readability
+4. Compatibility with existing test cases
+
+Please provide the optimized code and explanation of improvements.
+```
+
+**Usage:** `/user:optimize`
+
+### Tips and Best Practices
+
+- **Clear Instructions**: Write specific and clear instructions in commands
+- **Structure**: Organize long instructions with numbered lists or headings
+- **Reusability**: Avoid project-specific details to make commands generally usable
+- **Testing**: Test commands after creation to verify their behavior
 
 ---
 

@@ -5,6 +5,10 @@ export interface SlashCommand {
   description: string;
 }
 
+export interface ExtendedSlashCommand extends SlashCommand {
+  isCustom?: boolean;
+}
+
 export const SLASH_COMMANDS: Array<SlashCommand> = [
   {
     command: "/clear",
@@ -38,3 +42,24 @@ export const SLASH_COMMANDS: Array<SlashCommand> = [
     description: "MCPサーバーを一覧表示",
   },
 ];
+
+/**
+ * カスタムコマンドを含む全スラッシュコマンドを取得
+ */
+export async function getAllSlashCommands(): Promise<
+  Array<ExtendedSlashCommand>
+> {
+  const { loadCustomCommands } = await import("./custom-commands.js");
+  const customCommands = await loadCustomCommands();
+
+  const allCommands: Array<ExtendedSlashCommand> = [
+    ...SLASH_COMMANDS.map((cmd) => ({ ...cmd, isCustom: false })),
+    ...customCommands.map((cmd) => ({
+      command: cmd.command,
+      description: cmd.description,
+      isCustom: true,
+    })),
+  ];
+
+  return allCommands;
+}
