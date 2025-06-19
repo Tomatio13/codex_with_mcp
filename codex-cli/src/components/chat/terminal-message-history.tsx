@@ -6,10 +6,8 @@ import type { FileOpenerScheme } from "src/utils/config.js";
 
 import TerminalChatResponseItem from "./terminal-chat-response-item.js";
 import TerminalHeader from "./terminal-header.js";
-import { log } from "../../utils/logger/log";
-import { useMcpManager } from "../../utils/mcp/index.js";
 import { Box, Static } from "ink";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 
 // A batch entry can either be a standalone response item or a grouped set of
 // items (e.g. auto‑approved tool‑call batches) that should be rendered
@@ -42,37 +40,12 @@ const TerminalMessageHistory: React.FC<TerminalMessageHistoryProps> = ({
   // Flatten batch entries to response items.
   const messages = useMemo(() => batch.map(({ item }) => item!), [batch]);
 
-  // Get MCP stats for status checking
-  const { stats } = useMcpManager();
-
-  // State to track whether header should be rendered statically
-  const [renderHeaderStatic, setRenderHeaderStatic] = useState(false);
-
-  // Check MCP status to determine if we should render statically
-  useEffect(() => {
-    if (
-      !renderHeaderStatic &&
-      (stats.status === "connected" || stats.status === "error")
-    ) {
-      log(
-        `[Terminal History] MCP status finalized: ${stats.status}, switching to static header`,
-      );
-      setRenderHeaderStatic(true);
-    }
-  }, [stats.status, renderHeaderStatic]);
-
   return (
     <Box flexDirection="column">
-      {/* Conditionally render the header outside of Static if not in final state */}
-      {!renderHeaderStatic && (
-        <TerminalHeader key="dynamic-header" {...headerProps} />
-      )}
-
-      {/* The dedicated thinking indicator in the input area now displays the
-          elapsed time, so we no longer render a separate counter here. */}
-      <Static items={renderHeaderStatic ? ["header", ...messages] : messages}>
+      {/* Always render header at the top, either statically or dynamically */}
+      <Static items={["header", ...messages]}>
         {(item, index) => {
-          if (renderHeaderStatic && item === "header") {
+          if (item === "header") {
             return <TerminalHeader key="static-header" {...headerProps} />;
           }
 
